@@ -1,0 +1,37 @@
+{
+  "name": "announcement-loop",
+  "version": "1.0.0",
+  "description": "Bring event listings from the church website to TVs around the church",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "node_modules/.bin/electron .",
+    "dev": "electron . --debug",
+    "test": "mocha && standard",
+    "package": "npm-run-all package:*",
+    "package:mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --out=out --icon=assets/app-icon/mac/app.icns --osx-sign.identity='Developer ID Application: GitHub' --extend-info=assets/mac/info.plist",
+    "package:win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --out=builds --prune=true --icon=assets/icons/win/icon.ico --version-string.ProductName=\"Tenth Announcement Loop\"",
+    "package:linux": "electron-packager . --overwrite --platform=linux --arch=x64 --out=out",
+    "package:sign-exe": "signcode './out/Electron API Demos-win32-ia32/Electron API Demos.exe' --cert ~/electron-api-demos.p12 --prompt --name 'Electron API Demos' --url 'http://electron.atom.io'",
+    "package:installer": "node ./script/installer.js",
+    "package:sign-installer": "signcode './out/windows-installer/ElectronAPIDemosSetup.exe' --cert ~/electron-api-demos.p12 --prompt --name 'Electron API Demos' --url 'http://electron.atom.io'",
+    "package:mas": "./script/mas.sh",
+    "windows-store": "node ./script/windows-store.js",
+    "release": "node ./script/release.js",
+    "prepack": "check-for-leaks",
+    "prepush": "check-for-leaks"
+  },
+  "author": "James Kurtz",
+  "license": "MIT",
+  "devDependencies": {
+    "check-for-leaks": "^1.2.0",
+    "electron": "^1.7.10",
+    "electron-packager": "^10.1.1",
+    "npm-run-all": "^4.1.2"
+  },
+  "dependencies": {
+    "datejs": "^1.0.0-rc3",
+    "dom-parser": "^0.1.5",
+    "request": "^2.83.0"
+  }
+}
