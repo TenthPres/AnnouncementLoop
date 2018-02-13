@@ -3,6 +3,8 @@
 This is an [Electron](https://electronjs.org/) App designed to advertise upcoming events on TVs around our church.  The 
 listings (text and images) are pulled from [our website](https://www.tenth.org/events), and update automatically.  
 
+![Sample Announcement: a Bible Study](documentation/images/sampleScreenshot.png)
+
 ## If you want this for your own church...
 
 You're welcome to steal our code.  Hopefully this is obvious, but please don't abuse our name or branding.  As 
