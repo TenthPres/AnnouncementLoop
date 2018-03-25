@@ -95,7 +95,8 @@ function updateEventList() {
                         let time = row[0].textContent.trim(),
                             title = row[1].textContent.trim(),
                             ministry = row[2].textContent.trim(),
-                            location = row[3].textContent.trim();
+                            location = row[3].textContent.trim(),
+                            category = row[4].textContent.trim();
 
                         if (location === '' || location === 'Tenth Presbyterian Church')
                             continue;
@@ -108,10 +109,15 @@ function updateEventList() {
                             dtEnd: time.clone().addMinutes(90),
                             ministry: ministry,
                             location: location,
+                            category: category,
                             link: link,
                             img: null
                         };
                         const _date = date;
+
+                        // skip any future(-ish) small groups
+                        if (evtObj.category === "Small Group" && getTense(evtObj) > 0)
+                            continue;
 
                         request('https://nocache.tenth.org' + evtObj.link, function(error, response, body) {
                             let detailDom = parser.parseFromString(body),
