@@ -57,85 +57,27 @@ function updateEventList() {
     const d1 = d.format('%b+d%2C+%Y');
     const d2 = d.addDays(15).format('%b+d%2C+%Y');
 
-    request('https://nocache.tenth.org/events?start_date=' + d1 + '&end_date=' + d2, fromRequest);
 
-    function fromRequest(error, response, body) {
-        const parser = new DomParser();
-        let bodyDom = parser.parseFromString(body),
-            table = bodyDom.getElementsByClassName('events-table')[0],
-            date,
-            newEventList = [],
-            alreadyIncludedSlugs = [];
+    request('https://tenth.gospel.io/events/features-json', eventsCallback);
 
-        for (let ri in table.childNodes) {
-            if (!table.childNodes.hasOwnProperty(ri))
+    function eventsCallback(error, response, body) {
+        let evts = JSON.parse(body),
+            newEventList = [];
+
+        for (let ei in evts) {
+            if (!evts[ei].hasOwnProperty('title'))
                 continue;
 
-            switch (table.childNodes[ri].nodeName) {
-                case 'thead':
-                    date = table.childNodes[ri].childNodes[1].textContent + " 2018"; // TODO figure out a way to deduce the year.
-                    break;
-
-                case 'tbody':
-                    for (let ei in table.childNodes[ri].childNodes) {
-                        if (!table.childNodes[ri].childNodes.hasOwnProperty(ei))
-                            continue;
-
-                        if (table.childNodes[ri].childNodes[ei].nodeName !== 'tr')
-                            continue;
-
-                        let row = table.childNodes[ri].childNodes[ei].getElementsByTagName('td'),
-                            link = row[1].childNodes[1].getAttribute('href');
-
-                        if (alreadyIncludedSlugs.indexOf(link) >= 0)
-                            continue;
-
-                        alreadyIncludedSlugs.push(link);
-
-                        let time = row[0].textContent.trim(),
-                            title = row[1].textContent.trim(),
-                            ministry = row[2].textContent.trim(),
-                            location = row[3].textContent.trim(),
-                            category = row[4].textContent.trim();
-
-                        if (location === '' || location === 'Tenth Presbyterian Church')
-                            continue;
-
-                        time = new Date(Date.parse(date + ", " + time + " EST"));
-
-                        let evtObj = {
-                            title: title,
-                            dtStart: time,
-                            dtEnd: time.clone().addMinutes(90),
-                            ministry: ministry,
-                            location: location,
-                            category: category,
-                            link: link,
-                            img: null
-                        };
-                        const _date = date;
-
-                        // skip any future(-ish) small groups
-                        if (evtObj.category === "Small Group" && getTense(evtObj) > 0)
-                            continue;
-
-                        request('https://nocache.tenth.org' + evtObj.link, function(error, response, body) {
-                            let detailDom = parser.parseFromString(body),
-                                imgHolder = detailDom.getElementsByClassName('resource-promo-image'),
-                                schedule = detailDom.getElementsByClassName('schedule');
-
-                            if (imgHolder.length > 0)
-                                evtObj.img = imgHolder[0].childNodes[1].getAttribute('src');
-
-                            if (schedule.length > 0) {
-                                evtObj.dtEnd = new Date(Date.parse(_date + ", " + schedule[0].childNodes[6].textContent.trim() + " EST"));
-                            }
-                        });
-
-                        newEventList.push(evtObj);
-                    }
-                    break;
-            }
+            let evtObj = {
+                title: evts[ei].title,
+                dtStart: new Date(Date.parse(evts[ei].start)),
+                dtEnd: new Date(Date.parse(evts[ei].end)),
+                ministry: evts[ei].ministry ? evts[ei].ministry : '',
+                location: evts[ei].location,
+                category: evts[ei].category,
+                img: evts[ei].imageUrl
+            };
+            newEventList.push(evtObj)
         }
 
         eventList = newEventList;
