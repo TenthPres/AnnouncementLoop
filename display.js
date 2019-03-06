@@ -75,7 +75,9 @@ function updateEventList() {
                 ministry: evts[ei].ministry ? evts[ei].ministry : '',
                 location: evts[ei].location,
                 category: evts[ei].category,
-                img: evts[ei].imageUrl
+                img: evts[ei].imageUrl,
+                allDay: evts[ei].allDay,
+                verb: evts[ei].verb
             };
             newEventList.push(evtObj)
         }
@@ -151,33 +153,42 @@ function changeSlide() {
             nextSlide.innerHTML = html;
 
         // This Sunday
-        } else if (event.dtStart.format('D') === 'Sun' && Date.today().getWeek() === event.dtStart.getWeek()) {
-            nextSlide.time = 1500;
-            nextSlide.classList.add('thisSunday');
-            let count = 0;
-            let html = "";
-
-            if (Date.today().format('D') === "Sun")
-                html += "<div><h2>Events Today</h2><table>";
-            else
-                html += "<div><h2>Events This Sunday</h2><table>";
-
-            /** @var Date event.dtStart */
-            while (event.dtStart.format('D') === 'Sun' && Date.today().getWeek() === event.dtStart.getWeek() && count++ < 7) {
-                html += "<tr><td class='right'>" + event.dtStart.toTimeStringFormatted() + "</td><td>" + event.title + "</td><td>" + event.location + "</td></tr>";
-
-                nextSlide.time += 750;
-
-                event = eventList[++nextEventToSlideify];
-            }
-            nextEventToSlideify--;
-
-            html += "</table></div>";
-            nextSlide.innerHTML = html;
+        // } else if (event.dtStart.format('D') === 'Sun' && Date.today().getWeek() === event.dtStart.getWeek()) {
+        //     nextSlide.time = 1500;
+        //     nextSlide.classList.add('thisSunday');
+        //     let count = 0;
+        //     let html = "";
+        //
+        //     if (Date.today().format('D') === "Sun")
+        //         html += "<div><h2>Events Today</h2><table>";
+        //     else
+        //         html += "<div><h2>Events This Sunday</h2><table>";
+        //
+        //     /** @var Date event.dtStart */
+        //     while (event.dtStart.format('D') === 'Sun' && Date.today().getWeek() === event.dtStart.getWeek() && count++ < 7) {
+        //         html += "<tr><td class='right'>" + event.dtStart.toTimeStringFormatted() + "</td><td>" + event.title + "</td><td>" + event.location + "</td></tr>";
+        //
+        //         nextSlide.time += 750;
+        //
+        //         event = eventList[++nextEventToSlideify];
+        //     }
+        //     nextEventToSlideify--;
+        //
+        //     html += "</table></div>";
+        //     nextSlide.innerHTML = html;
 
         // Everything else
         } else {
-            nextSlide.innerHTML = "<div><h2>" + event.title + "</h2><p>" + event.dtStart.toDateStringFormatted() + " &sdot; " + event.dtStart.toTimeStringFormatted() + "</p><p>" + event.location + "</p><p class='ministry'>" + event.ministry + "</p></div>";
+            var html = "<div>";
+            html += "<h2>" + event.title + "</h2>";
+            html += "<p>" + event.dtStart.toDateStringFormatted() + (event.allDay ? "" : " &sdot; <small class=\"time\">" + event.dtStart.toTimeStringFormatted()) + "</small></p>";
+            if (event.verb !== "") {
+                html += "<p>" + event.verb + " at tenth.org</p>";
+            } else {
+                html += "<p>" + event.location + "</p>";
+            }
+            html += "<p class='ministry'>" + event.ministry + "</p></div>";
+            nextSlide.innerHTML = html;
             nextSlide.classList.add('single');
             nextSlide.time = 4000;
 
