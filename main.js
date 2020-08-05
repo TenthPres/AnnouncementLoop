@@ -27,7 +27,7 @@ function createWindow () {
         return 0;
     })[0];
 
-    const appIcon = path.join(__dirname, 'assets/icons/png/64x64.png');
+    const appIcon = path.join(__dirname, 'assets/icons/icon.ico');
 
     loopWindow = new BrowserWindow({
         x: displayToShowOn.bounds.x + 50,
