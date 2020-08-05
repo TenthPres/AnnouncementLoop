@@ -1,8 +1,8 @@
 const request = require('request');
-const DomParser = require('dom-parser');
 require('datejs');
 
-let eventList = [],
+let featuredEventList = [],
+    currentEventList = [],
     nextEventToSlideify = -1,
     previousSlide = null,
     currentSlide = null,
@@ -52,19 +52,19 @@ Date.prototype.toTimeStringFormatted = function() {
 };
 
 
-function updateEventList() {
-    const d = new Date();
-    const d1 = d.format('%b+d%2C+%Y');
-    const d2 = d.addDays(15).format('%b+d%2C+%Y');
+function updateEventLists() {
 
+    request('https://www.tenth.org/events/features-json', featuredCallback);
+    request('https://www.tenth.org/events/all-json', allCallback);
 
-    request('https://tenth.gospel.io/events/features-json', eventsCallback);
-
-    function eventsCallback(error, response, body) {
+    function featuredCallback(error, response, body) {
         let evts = JSON.parse(body),
             newEventList = [];
 
         for (let ei in evts) {
+            if (!evts.hasOwnProperty(ei))
+                continue;
+
             if (!evts[ei].hasOwnProperty('title'))
                 continue;
 
@@ -75,18 +75,54 @@ function updateEventList() {
                 ministry: evts[ei].ministry ? evts[ei].ministry : '',
                 location: evts[ei].location,
                 category: evts[ei].category,
-                img: evts[ei].imageUrl
+                imageUrl: evts[ei].imageUrl
             };
             newEventList.push(evtObj)
         }
 
-        eventList = newEventList;
+        featuredEventList = newEventList;
 
         if (currentSlide === null)
             changeSlide();
     }
+
+    function allCallback(error, response, body) {
+        let evts = JSON.parse(body),
+            newEventList = [],
+            now = new Date(),
+            later = (new Date()).addHours(24);
+
+        for (let ei in evts) {
+            if (!evts.hasOwnProperty(ei))
+                continue;
+
+            if (!evts[ei].hasOwnProperty('title'))
+                continue;
+
+            let evtObj = {
+                title: evts[ei].title,
+                dtStart: new Date(Date.parse(evts[ei].start)),
+                dtEnd: new Date(Date.parse(evts[ei].end)),
+                ministry: evts[ei].ministry ? evts[ei].ministry : '',
+                location: evts[ei].location,
+                diff: null
+            };
+
+            evtObj.diff = now.compareTo(evtObj.dtStart); // -1 if starts in the future.
+
+            if (now.compareTo(evtObj.dtEnd) > 0)
+                continue;
+
+            if (later.compareTo(evtObj.dtStart) < 0)
+                continue;
+
+            newEventList.push(evtObj)
+        }
+
+        currentEventList = newEventList;
+    }
 }
-updateEventList();
+updateEventLists();
 
 
 function changeSlide() {
@@ -126,7 +162,7 @@ function changeSlide() {
 
         // skip any past events
         do {
-            event = eventList[nextEventToSlideify++];
+            event = featuredEventList[nextEventToSlideify++];
             event.tense = getTense(event);
         } while (event.tense < 0);
         nextEventToSlideify--;
@@ -142,7 +178,7 @@ function changeSlide() {
                 html += "<tr><td>" + event.title + "</td><td>" + event.location + "</td></tr>";
                 nextSlide.time += 800;
 
-                event = eventList[++nextEventToSlideify];
+                event = featuredEventList[++nextEventToSlideify];
                 event.tense = getTense(event);
             }
             nextEventToSlideify--;
@@ -168,7 +204,7 @@ function changeSlide() {
 
                 nextSlide.time += 750;
 
-                event = eventList[++nextEventToSlideify];
+                event = featuredEventList[++nextEventToSlideify];
             }
             nextEventToSlideify--;
 
@@ -181,14 +217,16 @@ function changeSlide() {
             nextSlide.classList.add('single');
             nextSlide.time = 4000;
 
-            if (event.hasOwnProperty('img') && event.img !== null)
-                nextSlide.style.backgroundImage = "url('" + event.img + "')";
+            console.log(event);
+
+            if (event.hasOwnProperty('imageUrl') && event.imageUrl !== null)
+                nextSlide.style.backgroundImage = "url('" + event.imageUrl + "')";
         }
     }
 
     nextEventToSlideify++;
-    if (nextEventToSlideify >= eventList.length) {
-        updateEventList();
+    if (nextEventToSlideify >= featuredEventList.length) {
+        updateEventLists();
         nextEventToSlideify = -1;
     }
 
