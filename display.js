@@ -54,7 +54,10 @@ Date.prototype.toTimeStringFormatted = function() {
 
 function updateEventLists() {
 
-    request('https://www.tenth.org/wp-json/tribe/events/v1/events?featured=true&start_date=2022-01-29&end_date=2022-03-29&hide_subsequent_recurrences=1&per_page=200', featuredCallback);
+    let d0 = new Date(),
+        d1 = new Date().addMonths(3);
+
+    request("https://www.tenth.org/wp-json/tribe/events/v1/events?featured=true&start_date=" + d0.toString("yyyy-MM-dd") + "&end_date=" + d1.toString("yyyy-MM-dd") + "&hide_subsequent_recurrences=1&per_page=200", featuredCallback);
     // request('https://www.tenth.org/events/all-json', allCallback);
 
     function featuredCallback(error, response) {
