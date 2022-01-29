@@ -33,10 +33,14 @@ function createWindow () {
         x: displayToShowOn.bounds.x + 50,
         y: displayToShowOn.bounds.y + 50,
         kiosk: true,
-        show:false,
+        show: false,
         backgroundColor:'#000000',
         minimizable: false,
-        icon: appIcon
+        icon: appIcon,
+        webPreferences: {
+            nodeIntegration: true, // TODO this is hypothetically insecure.
+            contextIsolation: false,
+        }
     });
 
     loopWindow.setMenu(null);

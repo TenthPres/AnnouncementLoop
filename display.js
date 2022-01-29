@@ -54,12 +54,18 @@ Date.prototype.toTimeStringFormatted = function() {
 
 function updateEventLists() {
 
-    request('https://www.tenth.org/events/features-json', featuredCallback);
-    request('https://www.tenth.org/events/all-json', allCallback);
+    request('https://www.tenth.org/wp-json/tribe/events/v1/events?featured=true&start_date=2022-01-29&end_date=2022-03-29&hide_subsequent_recurrences=1&per_page=200', featuredCallback);
+    // request('https://www.tenth.org/events/all-json', allCallback);
 
-    function featuredCallback(error, response, body) {
-        let evts = JSON.parse(body),
-            newEventList = [];
+    function featuredCallback(error, response) {
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        let evts = JSON.parse(response.body.substr(1)).events,
+            newEventList = [],
+            newEventTitles = [];
 
         for (let ei in evts) {
             if (!evts.hasOwnProperty(ei))
@@ -68,14 +74,20 @@ function updateEventLists() {
             if (!evts[ei].hasOwnProperty('title'))
                 continue;
 
+            if (newEventTitles.indexOf(evts[ei].title) > -1)
+                continue;
+
+            newEventTitles.push(evts[ei].title);
+
             let evtObj = {
                 title: evts[ei].title,
-                dtStart: new Date(Date.parse(evts[ei].start)),
-                dtEnd: new Date(Date.parse(evts[ei].end)),
-                ministry: evts[ei].ministry ? evts[ei].ministry : '',
-                location: evts[ei].location,
-                category: evts[ei].category,
-                imageUrl: evts[ei].imageUrl
+                dtStart: new Date(Date.parse(evts[ei].start_date)),
+                dtEnd: new Date(Date.parse(evts[ei].end_date)),
+                ministry: '', // TODO evts[ei].ministry ? evts[ei].ministry : '',
+                location: evts[ei].venue.venue ?? '',
+                category: evts[ei].categories.name ?? null,
+                imageUrl: evts[ei].slide ?? (evts[ei].image === false ? null : evts[ei].image.url),
+                hasSlideImage: !!evts[ei].slide
             };
             newEventList.push(evtObj)
         }
@@ -213,11 +225,15 @@ function changeSlide() {
 
         // Everything else
         } else {
-            nextSlide.innerHTML = "<div><h2>" + event.title + "</h2><p>" + event.dtStart.toDateStringFormatted() + " &sdot; " + event.dtStart.toTimeStringFormatted() + "</p><p>" + event.location + "</p><p class='ministry'>" + event.ministry + "</p></div>";
+            console.log(event);
+
+            if (event.hasOwnProperty('hasSlideImage') && event.hasSlideImage !== true) {
+                nextSlide.innerHTML = "<div><h2>" + event.title + "</h2><p>" + event.dtStart.toDateStringFormatted() + " &sdot; " + event.dtStart.toTimeStringFormatted() + "</p><p>" + event.location + "</p><p class='ministry'>" + event.ministry + "</p></div>";
+            } else {
+                nextSlide.innerHTML = "";
+            }
             nextSlide.classList.add('single');
             nextSlide.time = 4000;
-
-            console.log(event);
 
             if (event.hasOwnProperty('imageUrl') && event.imageUrl !== null)
                 nextSlide.style.backgroundImage = "url('" + event.imageUrl + "')";
