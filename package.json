@@ -9,9 +9,9 @@
     "dev": "electron . --debug",
     "build": "npm-run-all build:*",
     "!build:mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --out=builds --icon=assets/app-icon/mac/app.icns --osx-sign.identity='Developer ID Application: GitHub' --extend-info=assets/mac/info.plist",
-    "build:win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --out=builds --prune=true --icon=assets/icons/win/icon.ico --version-string.ProductName=\"Tenth Announcement Loop\"",
+    "build:win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --out=builds --prune=true --icon=assets/icons/icon.ico --version-string.ProductName=\"Tenth Announcement Loop\"",
     "!build:linux": "electron-packager . --overwrite --platform=linux --arch=x64 --out=builds",
-    "!build:sign-exe": "signcode './builds/win32-ia32/announcement-loop.exe' --cert ~/announcement-loop.p12 --prompt --name 'Tenth Announcement Loop' --url 'http://electron.atom.io'",
+    "build:sign-exe": "signcode './builds/win32-ia32/announcement-loop.exe' --cert ~/announcement-loop.p12 --prompt --name 'Tenth Announcement Loop' --url 'http://electron.atom.io'",
     "!build:installer": "node ./script/installer.js",
     "!build:sign-installer": "signcode './builds/windows-installer/announcement-loop.exe' --cert ~/announcement-loop.p12 --prompt --name 'Tenth Announcement Loop' --url 'http://electron.atom.io'",
     "release": "node ./script/release.js",
@@ -24,7 +24,8 @@
     "check-for-leaks": "^1.2.1",
     "electron": "*",
     "electron-packager": "*",
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "signcode": "^1.0.0"
   },
   "dependencies": {
     "datejs": "^1.0.0-rc3",
