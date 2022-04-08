@@ -16,7 +16,13 @@
     "!build:sign-installer": "signcode './builds/windows-installer/announcement-loop.exe' --cert ~/announcement-loop.p12 --prompt --name 'Tenth Announcement Loop' --url 'http://electron.atom.io'",
     "release": "node ./script/release.js",
     "prepack": "check-for-leaks",
-    "prepush": "check-for-leaks"
+    "prepush": "check-for-leaks",
+
+    "prestart": "npm run pre",
+    "predev": "npm run pre",
+    "prebuild": "npm run pre",
+    "pre": "npm-run-all pre:*",
+    "pre:less": "lessc styling/core.less styling/core.css"
   },
   "author": "James Kurtz",
   "license": "MIT",
@@ -24,6 +30,7 @@
     "check-for-leaks": "^1.2.1",
     "electron": "*",
     "electron-packager": "*",
+    "lessc": "^1.0.2",
     "npm-run-all": "^4.1.5",
     "signcode": "^1.0.0"
   },
