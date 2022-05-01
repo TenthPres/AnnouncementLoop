@@ -92,10 +92,10 @@ app.on('activate', function () {
 
 
 ///
-//The connection to the updating module:
+// The connection to the updating module:
 require('update-electron-app')({notifyUser: false})
 
-//An event handler to restart when there's an update downloaded:
+// An event handler to restart when there's an update downloaded:
 electron.autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     // update and restart app
     const { app, autoUpdater, dialog } = require('electron');
@@ -111,34 +111,9 @@ electron.autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) 
 
     //Show the message prompt dialogue:
     autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-        const dialogOpts = {
-          type: 'info',
-          //   buttons: ['Restart', 'Later'],
-          title: 'Application Update',
-          message: process.platform === 'win32' ? releaseNotes : releaseName,
-          detail: 'A new version has been downloaded. The application must restart to apply the updates. Restarting...'
-        }
-      
-        dialog.showMessageBox(dialogOpts).then((returnValue) => {
-            //   if (returnValue.response === 0) autoUpdater.quitAndInstall()
-
-            let date = new Date();
-            let day = date.getDay();
-            let hour = date.getHours();
-            // console.log(day);
-            // console.log(hour);
-
-            let timeout;
-
-            if(hour >= 22){     //Start the updates if after 10pm
-                timeout = setTimeout(autoUpdater.quitAndInstall, 5000);
-            }
-        })
+        console.info('An update has been downloaded. The application will be restarted to install the update momentarily');
+        setTimeout(autoUpdater.quitAndInstall, 5000);
     })
-
-    // function restartAndUpdate() {
-    //     autoUpdater.quitAndInstall();
-    // }
 
     autoUpdater.on('error', message => {
         console.error('There was a problem updating the application')
