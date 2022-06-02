@@ -90,5 +90,37 @@ app.on('activate', function () {
     }
 });
 
+
+///
+// The connection to the updating module:
+require('update-electron-app')({notifyUser: false})
+
+// An event handler to restart when there's an update downloaded:
+electron.autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    // update and restart app
+    const { app, autoUpdater, dialog } = require('electron');
+
+    const server = 'https://update.electronjs.org'
+    const url = `${server}/update/${process.platform}/${app.getVersion()}`
+
+    autoUpdater.setFeedURL({ url })
+
+    setInterval(() => {
+        autoUpdater.checkForUpdates()
+    }, 10 * 60 * 1000)
+
+    //Show the message prompt dialogue:
+    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+        console.info('An update has been downloaded. The application will be restarted to install the update momentarily');
+        setTimeout(autoUpdater.quitAndInstall, 5000);
+    })
+
+    autoUpdater.on('error', message => {
+        console.error('There was a problem updating the application')
+        console.error(message)
+    })
+})
+
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

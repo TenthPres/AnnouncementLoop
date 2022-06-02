@@ -17,7 +17,6 @@
     "release": "node ./script/release.js",
     "prepack": "check-for-leaks",
     "prepush": "check-for-leaks",
-
     "prestart": "npm run pre",
     "predev": "npm run pre",
     "prebuild": "npm run pre",
@@ -36,6 +35,11 @@
   },
   "dependencies": {
     "datejs": "^1.0.0-rc3",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "update-electron-app": "^2.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TenthPres/AnnouncementLoop.git"
   }
 }
